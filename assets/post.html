@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Varritech - Secure CI/CD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 1200px;
+      height: 1200px;
+      background-color: #0a0020;
+      font-family: 'Chakra Petch', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Freeform gradient blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+    }
+
+    .blob-1 {
+      width: 600px;
+      height: 600px;
+      background: linear-gradient(135deg, #7b2ff7 0%, #2f80ed 100%);
+      top: -200px;
+      right: -200px;
+    }
+
+    .blob-2 {
+      width: 500px;
+      height: 500px;
+      background: linear-gradient(225deg, #f72f8a 0%, #ff6b35 100%);
+      bottom: -150px;
+      left: -150px;
+    }
+
+    .blob-3 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(45deg, #00d9ff 0%, #00ff88 100%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Scanlines overlay */
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1) 0px,
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Vignette */
+    .vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(10, 0, 32, 0.6) 100%);
+      pointer-events: none;
+      z-index: 101;
+    }
+
+    /* Bauhaus geometric shapes */
+    .bauhaus-shape {
+      position: absolute;
+      opacity: 0.12;
+    }
+
+    .shape-circle {
+      width: 150px;
+      height: 150px;
+      border: 8px solid #ffffff;
+      border-radius: 50%;
+      top: 150px;
+      left: 100px;
+    }
+
+    .shape-rect {
+      width: 120px;
+      height: 200px;
+      background: #ffffff;
+      transform: rotate(15deg);
+      bottom: 200px;
+      right: 150px;
+    }
+
+    .shape-triangle {
+      width: 0;
+      height: 0;
+      border-left: 80px solid transparent;
+      border-right: 80px solid transparent;
+      border-bottom: 140px solid rgba(255, 255, 255, 0.15);
+      top: 400px;
+      right: 300px;
+    }
+
+    .shape-line {
+      width: 300px;
+      height: 12px;
+      background: #ffffff;
+      transform: rotate(-30deg);
+      bottom: 350px;
+      left: 200px;
+    }
+
+    /* Main content container */
+    .container {
+      position: relative;
+      z-index: 10;
+      padding: 80px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Logo */
+    .logo-container {
+      position: absolute;
+      top: 60px;
+      right: 80px;
+      width: 180px;
+      height: 180px;
+    }
+
+    .logo {
+      width: 100%;
+      height: 100%;
+      background-image: url('varritech-logo.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      filter: invert(1) brightness(2);
+    }
+
+    /* Hook text */
+    .hook {
+      font-size: 72px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.1;
+      max-width: 900px;
+      margin-top: 40px;
+    }
+
+    .hook .strikethrough {
+      text-decoration: line-through;
+      opacity: 0.5;
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    .hook .pivot {
+      color: #ccff00; /* Chartreuse */
+      display: block;
+    }
+
+    /* Stat pills */
+    .stats {
+      display: flex;
+      gap: 30px;
+      margin-top: 60px;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 24px 32px;
+      min-width: 220px;
+    }
+
+    .stat-value {
+      font-size: 48px;
+      font-weight: 700;
+      color: #ccff00;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 400;
+    }
+
+    /* Glassmorphism diff card */
+    .diff-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      padding: 40px;
+      margin-top: 50px;
+      flex-grow: 1;
+    }
+
+    .diff-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 24px;
+    }
+
+    .diff-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .diff-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .diff-icon {
+      font-size: 24px;
+      min-width: 32px;
+    }
+
+    /* CTA section */
+    .cta-section {
+      margin-top: auto;
+      text-align: center;
+      padding-bottom: 40px;
+    }
+
+    .cta-text {
+      font-size: 36px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+    }
+
+    .repo-url {
+      font-size: 24px;
+      color: #ccff00;
+      font-weight: 600;
+      background: rgba(204, 255, 0, 0.1);
+      padding: 16px 32px;
+      border-radius: 12px;
+      display: inline-block;
+      border: 2px solid #ccff00;
+    }
+
+    /* Tagline */
+    .tagline {
+      position: absolute;
+      bottom: 40px;
+      left: 80px;
+      font-size: 20px;
+      color: rgba(255, 255, 255, 0.6);
+      font-style: italic;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Gradient blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <!-- Scanlines and vignette -->
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <!-- Bauhaus shapes -->
+  <div class="bauhaus-shape shape-circle"></div>
+  <div class="bauhaus-shape shape-rect"></div>
+  <div class="bauhaus-shape shape-triangle"></div>
+  <div class="bauhaus-shape shape-line"></div>
+
+  <!-- Logo -->
+  <div class="logo-container">
+    <div class="logo"></div>
+  </div>
+
+  <!-- Main content -->
+  <div class="container">
+    <div>
+      <!-- Hook -->
+      <div class="hook">
+        <span class="strikethrough">Trust AI autofix blindly</span>
+        <span class="pivot">→ Your CI/CD is now a backdoor</span>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat-pill">
+          <div class="stat-value">317 pts</div>
+          <div class="stat-label">#1 on Hacker News</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-value">$4.45M</div>
+          <div class="stat-label">Avg breach cost</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-value">15 min</div>
+          <div class="stat-label">To implement fix</div>
+        </div>
+      </div>
+
+      <!-- Diff card -->
+      <div class="diff-card">
+        <div class="diff-title">🛡️ What's in the repo:</div>
+        <div class="diff-item">
+          <span class="diff-icon">✓</span>
+          <span>AI review gate workflow (blocks bot-only PRs)</span>
+        </div>
+        <div class="diff-item">
+          <span class="diff-icon">✓</span>
+          <span>Pre-commit secrets scanning with gitleaks</span>
+        </div>
+        <div class="diff-item">
+          <span class="diff-icon">✓</span>
+          <span>Terraform + OPA policy validation</span>
+        </div>
+        <div class="diff-item">
+          <span class="diff-icon">✓</span>
+          <span>Audit log export scripts for compliance</span>
+        </div>
+        <div class="diff-item">
+          <span class="diff-icon">✓</span>
+          <span>Complete implementation guide (1500 words)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <div class="cta-text">FORK THE REPO</div>
+      <div class="repo-url">github.com/Varritech/varritech-secure-ci-pipeline</div>
+    </div>
+  </div>
+
+  <!-- Tagline -->
+  <div class="tagline">Bold ideas wait for no one.</div>
+</body>
+</html>
