@@ -1,0 +1,46 @@
+name: Terraform Validate
+
+on:
+  pull_request:
+    paths:
+      - '**.tf'
+      - '**.tfvars'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+      
+      - name: Setup OPA
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: latest
+      
+      - name: Initialize Terraform
+        run: terraform init -backend=false
+      
+      - name: Validate Terraform Syntax
+        run: terraform validate
+      
+      - name: Generate JSON plan for OPA
+        run: terraform show -json > tfplan.json
+      
+      - name: Run OPA Policy Checks
+        run: |
+          opa eval \
+            --data policies/opa/ \
+            --input tfplan.json \
+            'data.terraform.deny' \
+            --format pretty
+      
+      - name: Security Summary
+        run: |
+          echo "✅ Terraform validation complete"
+          echo "📋 All syntax checks passed"
+          echo "🛡️ OPA policy evaluation complete"

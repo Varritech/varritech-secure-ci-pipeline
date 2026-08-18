@@ -1,0 +1,32 @@
+name: AI Review Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled]
+
+jobs:
+  require-human-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for AI-only PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const commits = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number
+            });
+            
+            // Check if all commits are from github-actions or dependabot
+            const aiAuthors = ['github-actions[bot]', 'dependabot[bot]', 'copilot-suggestions[bot]'];
+            const allAI = commits.data.every(c => 
+              aiAuthors.includes(c.commit.author?.name) || c.commit.author?.type === 'Bot'
+            );
+            
+            if (allAI && !pr.labels.some(l => l.name === 'ai-reviewed')) {
+              core.setFailed('❌ AI-only PR requires human review. Please add the "ai-reviewed" label after manual inspection.');
+            } else {
+              console.log('✅ PR has human author or ai-reviewed label');
+            }
